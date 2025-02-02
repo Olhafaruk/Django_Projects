@@ -1,4 +1,5 @@
-# Учебный проект "Новости Info to Go"
+def path(param, main):
+    passto Go"
 
 
 ## Урок 1
