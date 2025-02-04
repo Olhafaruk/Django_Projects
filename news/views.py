@@ -103,3 +103,20 @@ def get_detail_article_by_id(request, article_id):
         ],
     }
     return render(request, 'news/article_detail.html', context=info)
+
+def get_detail_article_by_title(request, title):
+    """
+    Возвращает детальную информацию по новости для представления
+    """
+    article = get_object_or_404(Article, slug=title)
+    info = {
+        'article': article,
+        "users_count": 5,
+        "news_count": 10,
+        "menu": [
+            {"title": "Главная", "url": "/", "url_name": "index"},
+            {"title": "О проекте", "url": "/about/", "url_name": "about"},
+            {"title": "Каталог", "url": "/news/catalog/", "url_name": "catalog"},
+        ],
+    }
+    return render(request, 'news/article_detail.html', context=info)

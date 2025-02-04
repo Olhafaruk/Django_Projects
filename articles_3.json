@@ -1,4 +1,5 @@
-  [
+
+[
     {
         "model": "news.category",
         "pk": 1,
@@ -197,7 +198,8 @@
             "publication_date": "2023-10-01T12:00:00Z",
             "views": 0,
             "category": 1,
-            "tags": [1, 2]
+            "tags": [1, 2],
+            "slug": "koshki-nauchilis-govorit"
         }
     },
     {
@@ -209,7 +211,8 @@
             "publication_date": "2023-10-02T12:00:00Z",
             "views": 0,
             "category": 2,
-            "tags": [3, 4]
+            "tags": [3, 4],
+            "slug": "letayushchie-sobaki-zamecheny-nad-gorodom"
         }
     },
     {
@@ -221,7 +224,8 @@
             "publication_date": "2023-10-03T12:00:00Z",
             "views": 0,
             "category": 3,
-            "tags": [5, 6]
+            "tags": [5, 6],
+            "slug": "derevya-nachali-hodit"
         }
     },
     {
@@ -233,7 +237,8 @@
             "publication_date": "2023-10-04T12:00:00Z",
             "views": 0,
             "category": 4,
-            "tags": [7, 8]
+            "tags": [7, 8],
+            "slug": "ryby-poyut-operu"
         }
     },
     {
@@ -245,7 +250,8 @@
             "publication_date": "2023-10-05T12:00:00Z",
             "views": 0,
             "category": 5,
-            "tags": [9, 10]
+            "tags": [9, 10],
+            "slug": "pticy-stroyat-neboskreby"
         }
     },
     {
@@ -257,7 +263,8 @@
             "publication_date": "2023-10-06T12:00:00Z",
             "views": 0,
             "category": 6,
-            "tags": [11, 12]
+            "tags": [11, 12],
+            "slug": "medvedi-otkryli-restoran"
         }
     },
     {
@@ -269,7 +276,8 @@
             "publication_date": "2023-10-07T12:00:00Z",
             "views": 0,
             "category": 7,
-            "tags": [13, 14]
+            "tags": [13, 14],
+            "slug": "kroliki-igrayut-v-futbol"
         }
     },
     {
@@ -281,7 +289,8 @@
             "publication_date": "2023-10-08T12:00:00Z",
             "views": 0,
             "category": 1,
-            "tags": [1, 2, 3]
+            "tags": [1, 2, 3],
+            "slug": "lyagushki-uchatsya-v-universitete"
         }
     },
     {
@@ -293,7 +302,8 @@
             "publication_date": "2023-10-09T12:00:00Z",
             "views": 0,
             "category": 2,
-            "tags": [4, 5, 6]
+            "tags": [4, 5, 6],
+            "slug": "myshi-otkryli-bank"
         }
     },
     {
@@ -305,7 +315,8 @@
             "publication_date": "2023-10-10T12:00:00Z",
             "views": 0,
             "category": 3,
-            "tags": [7, 8, 9]
+            "tags": [7, 8, 9],
+            "slug": "pchely-stroyat-kosmicheskie-korabli"
         }
     },
     {
@@ -317,7 +328,8 @@
             "publication_date": "2023-10-11T12:00:00Z",
             "views": 0,
             "category": 4,
-            "tags": [10, 11, 12]
+            "tags": [10, 11, 12],
+            "slug": "slony-igrayut-v-shahmaty"
         }
     },
     {
@@ -329,7 +341,8 @@
             "publication_date": "2023-10-12T12:00:00Z",
             "views": 0,
             "category": 5,
-            "tags": [13, 14, 15]
+            "tags": [13, 14, 15],
+            "slug": "kury-otkryli-teatr"
         }
     },
     {
@@ -341,7 +354,8 @@
             "publication_date": "2023-10-13T12:00:00Z",
             "views": 0,
             "category": 6,
-            "tags": [1, 2, 3, 4]
+            "tags": [1, 2, 3, 4],
+            "slug": "lisy-otkryli-shkolu"
         }
     },
     {
@@ -353,7 +367,8 @@
             "publication_date": "2023-10-14T12:00:00Z",
             "views": 0,
             "category": 7,
-            "tags": [5, 6, 7, 8]
+            "tags": [5, 6, 7, 8],
+            "slug": "belki-otkryli-magazin"
         }
     },
     {
@@ -365,7 +380,8 @@
             "publication_date": "2023-10-15T12:00:00Z",
             "views": 0,
             "category": 1,
-            "tags": [9, 10, 11, 12]
+            "tags": [9, 10, 11, 12],
+            "slug": "zaytsy-otkryli-biblioteku"
         }
     },
     {
@@ -377,7 +393,8 @@
             "publication_date": "2023-10-16T12:00:00Z",
             "views": 0,
             "category": 2,
-            "tags": [13, 14, 15, 16]
+            "tags": [13, 14, 15, 16],
+            "slug": "ezhiki-otkryli-muzey"
         }
     },
     {
@@ -389,7 +406,8 @@
             "publication_date": "2023-10-17T12:00:00Z",
             "views": 0,
             "category": 3,
-            "tags": [17, 18, 19, 20]
+            "tags": [17, 18, 19, 20],
+            "slug": "kroty-otkryli-restoran"
         }
     },
     {
@@ -401,7 +419,8 @@
             "publication_date": "2023-10-18T12:00:00Z",
             "views": 0,
             "category": 4,
-            "tags": [1, 2, 3, 4]
+            "tags": [1, 2, 3, 4],
+            "slug": "letuchie-myshi-otkryli-kinoteatr"
         }
     },
     {
@@ -413,7 +432,8 @@
             "publication_date": "2023-10-19T12:00:00Z",
             "views": 0,
             "category": 5,
-            "tags": [5, 6, 7, 8]
+            "tags": [5, 6, 7, 8],
+            "slug": "pauki-otkryli-sportzal"
         }
     },
     {
@@ -425,7 +445,8 @@
             "publication_date": "2023-10-20T12:00:00Z",
             "views": 0,
             "category": 6,
-            "tags": [9, 10, 11, 12]
+            "tags": [9, 10, 11, 12],
+            "slug": "zhaby-otkryli-kafe"
         }
     },
     {
@@ -437,7 +458,8 @@
             "publication_date": "2023-10-21T12:00:00Z",
             "views": 0,
             "category": 7,
-            "tags": [13, 14, 15, 16]
+            "tags": [13, 14, 15, 16],
+            "slug": "utki-otkryli-salon-krasoty"
         }
     },
     {
@@ -449,7 +471,8 @@
             "publication_date": "2023-10-22T12:00:00Z",
             "views": 0,
             "category": 1,
-            "tags": [17, 18, 19, 20]
+            "tags": [17, 18, 19, 20],
+            "slug": "gusi-otkryli-fitnes-tsentr"
         }
     },
     {
@@ -461,7 +484,8 @@
             "publication_date": "2023-10-23T12:00:00Z",
             "views": 0,
             "category": 2,
-            "tags": [1, 2, 3, 4]
+            "tags": [1, 2, 3, 4],
+            "slug": "lebedi-otkryli-spa-salon"
         }
     },
     {
@@ -473,7 +497,8 @@
             "publication_date": "2023-10-24T12:00:00Z",
             "views": 0,
             "category": 3,
-            "tags": [5, 6, 7, 8]
+            "tags": [5, 6, 7, 8],
+            "slug": "flamingo-otkryli-tantsevalnuyu-studiyu"
         }
     },
     {
@@ -485,7 +510,8 @@
             "publication_date": "2023-10-25T12:00:00Z",
             "views": 0,
             "category": 4,
-            "tags": [9, 10, 11, 12]
+            "tags": [9, 10, 11, 12],
+            "slug": "pelikany-otkryli-yoga-studiyu"
         }
     },
     {
@@ -497,7 +523,8 @@
             "publication_date": "2023-10-26T12:00:00Z",
             "views": 0,
             "category": 5,
-            "tags": [13, 14, 15, 16]
+            "tags": [13, 14, 15, 16],
+            "slug": "aisty-otkryli-detskiy-sad"
         }
     },
     {
@@ -509,7 +536,8 @@
             "publication_date": "2023-10-27T12:00:00Z",
             "views": 0,
             "category": 6,
-            "tags": [17, 18, 19, 20]
+            "tags": [17, 18, 19, 20],
+            "slug": "tsapli-otkryli-shkolu-iskusstv"
         }
     },
     {
@@ -521,271 +549,8 @@
             "publication_date": "2023-10-28T12:00:00Z",
             "views": 0,
             "category": 7,
-            "tags": [1, 2, 3, 4]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 29,
-        "fields": {
-            "title": "Куропатки открыли кулинарную школу",
-            "content": "В лесу Z куропатки открыли кулинарную школу. Ученики довольны.",
-            "publication_date": "2023-10-29T12:00:00Z",
-            "views": 0,
-            "category": 1,
-            "tags": [5, 6, 7, 8]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 30,
-        "fields": {
-            "title": "Фазаны открыли школу танцев",
-            "content": "В городе Y фазаны открыли школу танцев. Ученики довольны.",
-            "publication_date": "2023-10-30T12:00:00Z",
-            "views": 0,
-            "category": 2,
-            "tags": [9, 10, 11, 12]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 31,
-        "fields": {
-            "title": "Кошки научились говорить",
-            "content": "Вчера в городе N кошки начали разговаривать на человеческом языке. Ученые в шоке.",
-            "publication_date": "2023-10-31T12:00:00Z",
-            "views": 0,
-            "category": 3,
-            "tags": [13, 14, 15, 16]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 32,
-        "fields": {
-            "title": "Летающие собаки замечены над городом",
-            "content": "Жители города M сообщают о летающих собаках. Власти обещают разобраться.",
-            "publication_date": "2023-11-01T12:00:00Z",
-            "views": 0,
-            "category": 4,
-            "tags": [17, 18, 19, 20]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 33,
-        "fields": {
-            "title": "Деревья начали ходить",
-            "content": "В лесу X деревья начали передвигаться. Экологи в панике.",
-            "publication_date": "2023-11-02T12:00:00Z",
-            "views": 0,
-            "category": 5,
-            "tags": [1, 2, 3, 4]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 34,
-        "fields": {
-            "title": "Рыбы поют оперу",
-            "content": "В аквариуме Y рыбы начали петь оперные арии. Зрители в восторге.",
-            "publication_date": "2023-11-03T12:00:00Z",
-            "views": 0,
-            "category": 6,
-            "tags": [5, 6, 7, 8]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 35,
-        "fields": {
-            "title": "Птицы строят небоскребы",
-            "content": "В городе Z птицы начали строить небоскребы. Архитекторы в недоумении.",
-            "publication_date": "2023-11-04T12:00:00Z",
-            "views": 0,
-            "category": 7,
-            "tags": [9, 10, 11, 12]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 36,
-        "fields": {
-            "title": "Медведи открыли ресторан",
-            "content": "В лесу W медведи открыли ресторан. Посетители довольны.",
-            "publication_date": "2023-11-05T12:00:00Z",
-            "views": 0,
-            "category": 1,
-            "tags": [13, 14, 15, 16]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 37,
-        "fields": {
-            "title": "Кролики играют в футбол",
-            "content": "В парке V кролики начали играть в футбол. Болельщики в восторге.",
-            "publication_date": "2023-11-06T12:00:00Z",
-            "views": 0,
-            "category": 2,
-            "tags": [17, 18, 19, 20]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 38,
-        "fields": {
-            "title": "Лягушки учатся в университете",
-            "content": "В университете U лягушки начали посещать лекции. Студенты в шоке.",
-            "publication_date": "2023-11-07T12:00:00Z",
-            "views": 0,
-            "category": 3,
-            "tags": [1, 2, 3, 4]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 39,
-        "fields": {
-            "title": "Мыши открыли банк",
-            "content": "В городе T мыши открыли банк. Клиенты довольны.",
-            "publication_date": "2023-11-08T12:00:00Z",
-            "views": 0,
-            "category": 4,
-            "tags": [5, 6, 7, 8]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 40,
-        "fields": {
-            "title": "Пчелы строят космические корабли",
-            "content": "В лесу S пчелы начали строить космические корабли. Ученые в недоумении.",
-            "publication_date": "2023-11-09T12:00:00Z",
-            "views": 0,
-            "category": 5,
-            "tags": [9, 10, 11, 12]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 41,
-        "fields": {
-            "title": "Слоны играют в шахматы",
-            "content": "В зоопарке R слоны начали играть в шахматы. Посетители в восторге.",
-            "publication_date": "2023-11-10T12:00:00Z",
-            "views": 0,
-            "category": 6,
-            "tags": [13, 14, 15, 16]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 42,
-        "fields": {
-            "title": "Куры открыли театр",
-            "content": "В деревне Q куры открыли театр. Зрители довольны.",
-            "publication_date": "2023-11-11T12:00:00Z",
-            "views": 0,
-            "category": 7,
-            "tags": [17, 18, 19, 20]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 43,
-        "fields": {
-            "title": "Лисы открыли школу",
-            "content": "В лесу P лисы открыли школу. Ученики довольны.",
-            "publication_date": "2023-11-12T12:00:00Z",
-            "views": 0,
-            "category": 1,
-            "tags": [1, 2, 3, 4]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 44,
-        "fields": {
-            "title": "Белки открыли магазин",
-            "content": "В парке O белки открыли магазин. Покупатели довольны.",
-            "publication_date": "2023-11-13T12:00:00Z",
-            "views": 0,
-            "category": 2,
-            "tags": [5, 6, 7, 8]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 45,
-        "fields": {
-            "title": "Зайцы открыли библиотеку",
-            "content": "В лесу N зайцы открыли библиотеку. Читатели довольны.",
-            "publication_date": "2023-11-14T12:00:00Z",
-            "views": 0,
-            "category": 3,
-            "tags": [9, 10, 11, 12]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 46,
-        "fields": {
-            "title": "Ежики открыли музей",
-            "content": "В городе M ежики открыли музей. Посетители довольны.",
-            "publication_date": "2023-11-15T12:00:00Z",
-            "views": 0,
-            "category": 4,
-            "tags": [13, 14, 15, 16]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 47,
-        "fields": {
-            "title": "Кроты открыли ресторан",
-            "content": "В лесу L кроты открыли ресторан. Посетители довольны.",
-            "publication_date": "2023-11-16T12:00:00Z",
-            "views": 0,
-            "category": 5,
-            "tags": [17, 18, 19, 20]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 48,
-        "fields": {
-            "title": "Летучие мыши открыли кинотеатр",
-            "content": "В городе K летучие мыши открыли кинотеатр. Зрители довольны.",
-            "publication_date": "2023-11-17T12:00:00Z",
-            "views": 0,
-            "category": 6,
-            "tags": [1, 2, 3, 4]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 49,
-        "fields": {
-            "title": "Пауки открыли спортзал",
-            "content": "В лесу J пауки открыли спортзал. Посетители довольны.",
-            "publication_date": "2023-11-18T12:00:00Z",
-            "views": 0,
-            "category": 7,
-            "tags": [5, 6, 7, 8]
-        }
-    },
-    {
-        "model": "news.article",
-        "pk": 50,
-        "fields": {
-            "title": "Жабы открыли кафе",
-            "content": "В городе I жабы открыли кафе. Посетители довольны.",
-            "publication_date": "2023-11-19T12:00:00Z",
-            "views": 0,
-            "category": 1,
-            "tags": [9, 10, 11, 12]
+            "tags": [1, 2, 3, 4],
+            "slug": "ibisy-otkryli-muzykalnuyu-shkolu"
         }
     }
 ]
