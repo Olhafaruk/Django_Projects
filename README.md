@@ -264,13 +264,13 @@ class Article(models.Model):
 - Установили `Shell Plus` командой `pip install django-extensions`
 - Добавили `django_extensions` в `INSTALLED_APPS` в файле `settings.py` (перед нашим приложением `news`) 
 - Запустили `Shell Plus` командой `python manage.py shell_plus`
-(для отображения `SQL` запросов в консоли - `python manage.py shell_plus --print-sql`)
+(для отображения `SQL` запросов в консоли - ` --print-sql`)
 (для выхода из консоли `Shell Plus` - `exit()`)
 
 **commit: `Урок 4: установка Shell Plus и подготовка ORM`**
 
 ### Загрузка данных в базу данных из JSON файла
-`python manage.py loaddata articles.json`
+
 
 **commit: `Урок 4: Наполнили базу данных тестовыми данными`**
 
