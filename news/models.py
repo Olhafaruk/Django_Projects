@@ -4,6 +4,18 @@ from django.db import models
 from django.utils.text import slugify
 
 
+class AllArticleManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset()
+
+
+class ArticleManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+    def sorted_by_title(self):
+        return self.get_queryset().all().order_by('-title')
+
+
 class Category(models.Model):
     name = models.CharField(max_length=255)
 
@@ -26,6 +38,10 @@ class Article(models.Model):
     category = models.ForeignKey('Category', on_delete=models.CASCADE, default=1)
     tags = models.ManyToManyField('Tag', related_name='articles')
     slug = models.SlugField(unique=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    objects = ArticleManager()
+    all_objects = AllArticleManager()
 
     def save(self, *args, **kwargs):
         # Сохраняем статью, чтобы получить id
@@ -41,4 +57,3 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
-

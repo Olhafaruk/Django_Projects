@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from itg import settings
 from news import views
 
 urlpatterns = [
@@ -24,13 +25,12 @@ urlpatterns = [
     path('', views.main, name='index'),
     path('about/', views.about, name='about'),
     path('news/', include('news.urls')),
+    path('__debug__/', include('debug_toolbar.urls')),
+    path('', include('news.urls')),
 ]
 
-
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-#     path('', views.main),
-#     path('info/', views.info),
-#     path('news/', views.get_all_news),
-#     path('news/<int:news_id>/', views.get_news_by_id),
-# ]
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
