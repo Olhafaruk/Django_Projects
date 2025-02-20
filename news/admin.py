@@ -35,7 +35,7 @@ class ArticleAdmin(admin.ModelAdmin):
     actions = (make_inactive, make_active)
     # fields позволяет выбирать поля для редактирования (не fieldsets)
     # fields = ('title', 'category', 'content', 'tags', 'is_active')
-
+    list_per_page = 10
     # fieldsets позволяет выбирать группы полей (не работает с fields)
     fieldsets = (
         ('Главная информация', {'fields': ('title', 'content')}),
