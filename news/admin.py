@@ -1,22 +1,31 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.contrib.admin import SimpleListFilter
 
 from .models import Article, Category, Tag
 
 
-admin.site.site_header = "My Blog Admin"
-admin.site.site_title = "My Blog Admin Portal"
-admin.site.index_title = "Welcome to My Blog Admin Portal"
+admin.site.site_header = "Админка Info to Go"
+admin.site.site_title = "Админка"
+admin.site.index_title = "Привет админ! Не сломай ничего."
 
 
-def make_inactive(modeladmin, request, queryset):
-    queryset.update(is_active=False)
+class ArticleSpiderFilter(SimpleListFilter):
+    title = 'Внутри пауки'
+    parameter_name = 'has_spiders'
 
-def make_active(modeladmin, request, queryset):
-    queryset.update(is_active=True)
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Есть'),
+            ('no', 'Нет')
+        )
 
-make_inactive.short_description = 'Сделать неактивными выбранные статьи'
-make_active.short_description = 'Сделать активными выбранные статьи'
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.filter(content__contains='пауки')
+        if self.value() == 'no':
+            return queryset.exclude(content__contains='пауки')
+        return queryset
 
 
 class TagInline(admin.TabularInline):
@@ -24,18 +33,24 @@ class TagInline(admin.TabularInline):
     extra = 1
 
 
+@admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
     # list_display отображает поля в таблице
-    list_display = ('title', 'category', 'publication_date', 'views', 'colored_status')
+    list_display = ('pk', 'title', 'category', 'publication_date', 'views', 'status', 'is_active', 'has_spiders')
+    # list_display_links позволяет указать в качестве ссылок на объект другие поля
+    list_display_links = ('pk', 'title')
     # list_filter позволяет фильтровать по полям
-    list_filter = ('category',)
+    list_filter = ('category', 'is_active', 'status', ArticleSpiderFilter)
+    # сортировка, возможна по нескольким полям, по возрастанию или по убыванию
+    ordering = ('category', '-is_active')
     # search_fields позволяет искать по полям
     search_fields = ('title', 'content')
     # actions позволяет выполнять действия над выбранными записями
-    actions = (make_inactive, make_active)
+    actions = ('make_inactive', 'make_active', 'set_checked', 'set_unchecked')
+    list_per_page = 20
     # fields позволяет выбирать поля для редактирования (не fieldsets)
     # fields = ('title', 'category', 'content', 'tags', 'is_active')
-    list_per_page = 10
+
     # fieldsets позволяет выбирать группы полей (не работает с fields)
     fieldsets = (
         ('Главная информация', {'fields': ('title', 'content')}),
@@ -48,12 +63,28 @@ class ArticleAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return Article.all_objects.get_queryset()
 
-    def colored_status(self, obj):
-        return format_html('<span style="color: {};">{}</span>', 'green' if obj.is_active else 'red', obj.is_active)
+    @admin.display(description='Пауки внутри')
+    def has_spiders(self, article):
+        return 'Да' if 'пауки' in article.content else 'Нет'
 
-    colored_status.short_description = 'Статус'
+    @admin.action(description='Сделать неактивными выбранные статьи')
+    def make_inactive(modeladmin, request, queryset):
+        queryset.update(is_active=False)
+
+    @admin.action(description='Сделать активными выбранные статьи')
+    def make_active(modeladmin, request, queryset):
+        queryset.update(is_active=True)
+
+    @admin.action(description='Отметить статьи как проверенные')
+    def set_checked(self, request, queryset):
+        updated = queryset.update(status=Article.Status.CHECKED)
+        self.message_user(request, f'{updated} статей было отмечено как проверенные')
+
+    @admin.action(description='Отметить статьи как не проверенные')
+    def set_unchecked(self, request, queryset):
+        updated = queryset.update(status=Article.Status.UNCHECKED)
+        self.message_user(request, f'{updated} статей было отмечено как не проверенные', 'warning')
 
 
-admin.site.register(Article, ArticleAdmin)
 admin.site.register(Category)
 admin.site.register(Tag)
