@@ -38,7 +38,7 @@ class ArticleAdmin(admin.ModelAdmin):
     # list_display отображает поля в таблице
     list_display = ('pk', 'title', 'category', 'publication_date', 'views', 'status', 'is_active', 'has_spiders')
     # list_display_links позволяет указать в качестве ссылок на объект другие поля
-    list_display_links = ('pk', 'title')
+    list_display_links = ('pk',)
     # list_filter позволяет фильтровать по полям
     list_filter = ('category', 'is_active', 'status', ArticleSpiderFilter)
     # сортировка, возможна по нескольким полям, по возрастанию или по убыванию
@@ -48,17 +48,24 @@ class ArticleAdmin(admin.ModelAdmin):
     # actions позволяет выполнять действия над выбранными записями
     actions = ('make_inactive', 'make_active', 'set_checked', 'set_unchecked')
     list_per_page = 20
+    # включение иерархического отображения по дате
+    date_hierarchy = 'publication_date'
+    # перенос кнопок сохранения в верхнюю часть формы
+    save_on_top = True
     # fields позволяет выбирать поля для редактирования (не fieldsets)
     # fields = ('title', 'category', 'content', 'tags', 'is_active')
 
     # fieldsets позволяет выбирать группы полей (не работает с fields)
     fieldsets = (
         ('Главная информация', {'fields': ('title', 'content')}),
-        ('Дополнительные параметры', {'fields': ('category', 'tags', 'is_active')}),
+        ('Настройки фильтрации', {'fields': ('category', 'is_active', 'status')}),
+        ('Доп. инфо', {'fields': ('views', 'slug')}),
     )
 
     # inlines позволяет добавлять дополнительные поля
     inlines = [TagInline]
+
+    readonly_fields = ('views', 'slug')
 
     def get_queryset(self, request):
         return Article.all_objects.get_queryset()
