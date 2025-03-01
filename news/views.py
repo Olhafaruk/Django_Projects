@@ -1,17 +1,14 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .models import Tag, Category
-
+from .models import Category
 from .models import Article
-
 
 """
 Информация в шаблоны будет браться из базы данных
-Но пока, мы сделаем переменные, куда будем записывать информацию, которая пойдет в 
-контекст шаблона
+Но пока, мы сделаем переменные, куда будем записывать информацию, которая пойдет в контекст шаблона
 """
 # Пример данных для новостей
-
 info = {
     "users_count": 5,
     "news_count": 10,
@@ -28,22 +25,18 @@ info = {
     ],
 }
 
-
 def main(request):
     """
     Представление рендерит шаблон main.html
     """
     return render(request, 'main.html', context=info)
 
-
 def about(request):
     """Представление рендерит шаблон about.html"""
     return render(request, 'about.html', context=info)
 
-
 def catalog(request):
     return HttpResponse('Каталог новостей')
-
 
 def get_categories(request):
     """
@@ -51,13 +44,11 @@ def get_categories(request):
     """
     return HttpResponse('All categories')
 
-
 def get_news_by_category(request, slug):
     """
     Возвращает новости по категории для представления в каталоге
     """
     return HttpResponse(f'News by category {slug}')
-
 
 def get_news_by_tag(request, slug):
     """
@@ -65,10 +56,8 @@ def get_news_by_tag(request, slug):
     """
     return HttpResponse(f'News by tag {slug}')
 
-
 def get_category_by_name(request, slug):
     return HttpResponse(f"Категория {slug}")
-
 
 def get_all_news(request):
     """Функция для отображения страницы "Каталог"
@@ -80,7 +69,6 @@ def get_all_news(request):
     3. Сортировка по количеству просмотров в возрастающем порядке: `/news/catalog/?sort=views&order=asc`
     4. Сортировка по дате добавления в возрастающем порядке: `/news/catalog/?sort=publication_date&order=asc`
     """
-
     # считаем параметры из GET-запроса
     sort = request.GET.get('sort', 'publication_date')  # по умолчанию сортируем по дате загрузки
     order = request.GET.get('order', 'desc')  # по умолчанию сортируем по убыванию
@@ -102,26 +90,20 @@ def get_all_news(request):
 
     return render(request, 'news/catalog.html', context=context)
 
-
 def get_detail_article_by_id(request, article_id):
     """
     Возвращает детальную информацию по новости для представления
     """
     article = get_object_or_404(Article, id=article_id)
-
     context = {**info, 'article': article}
-
     return render(request, 'news/article_detail.html', context=context)
-
 
 def get_detail_article_by_title(request, title):
     """
     Возвращает детальную информацию по новости для представления
     """
     article = get_object_or_404(Article, slug=title)
-
     context = {**info, 'article': article}
-
     return render(request, 'news/article_detail.html', context=context)
 
 def filter_news_by_tag_id(request, tag_id):
