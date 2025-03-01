@@ -1,9 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from .models import Tag, Category
-from .models import Category
-from .models import Article
-
+from .models import Tag, Category, Article
+from django.db.models import  Count
 """
 Информация в шаблоны будет браться из базы данных
 Но пока, мы сделаем переменные, куда будем записывать информацию, которая пойдет в контекст шаблона
@@ -12,6 +10,7 @@ from .models import Article
 info = {
     "users_count": 5,
     "news_count": 10,
+    "categories": Category.objects.all(),
     "menu": [
         {"title": "Главная",
          "url": "/",
@@ -25,18 +24,29 @@ info = {
     ],
 }
 
+def get_categories_with_news_count():
+    categories = Category.objects.all().annotate(news_count=Count('article'))
+    return categories
+
 def main(request):
     """
     Представление рендерит шаблон main.html
     """
-    return render(request, 'main.html', context=info)
+    categories = get_categories_with_news_count()
+    context = {**info, 'categories': categories}
+    return render(request, 'main.html', context=context)
+
 
 def about(request):
     """Представление рендерит шаблон about.html"""
-    return render(request, 'about.html', context=info)
+    categories = get_categories_with_news_count()
+    context = {**info, 'categories': categories}
+    return render(request, 'about.html', context=context)
 
 def catalog(request):
-    return HttpResponse('Каталог новостей')
+    categories = get_categories_with_news_count()
+    context = {**info, 'categories': categories}
+    return render(request, 'news/catalog.html', context=context)
 
 def get_categories(request):
     """
@@ -44,17 +54,23 @@ def get_categories(request):
     """
     return HttpResponse('All categories')
 
-def get_news_by_category(request, slug):
+def get_news_by_category(request, category_id):
     """
     Возвращает новости по категории для представления в каталоге
     """
-    return HttpResponse(f'News by category {slug}')
+    category = get_object_or_404(Category, pk=category_id)
+    articles = Article.objects.filter(category=category)
+    context = {**info, 'news': articles, 'news_count': len(articles), "categories": get_categories_with_news_count()}
+    return render(request, 'news/catalog.html', context=context)
 
-def get_news_by_tag(request, slug):
+def get_news_by_tag(request, tag_id):
     """
     Возвращает новости по тегу для представления в каталоге
     """
-    return HttpResponse(f'News by tag {slug}')
+    tag = get_object_or_404(Tag, pk=tag_id)
+    articles = Article.objects.filter(tags=tag)
+    context = {**info, 'news': articles, 'news_count': len(articles)}
+    return render(request, 'news/catalog.html', context=context)
 
 def get_category_by_name(request, slug):
     return HttpResponse(f"Категория {slug}")
@@ -117,3 +133,6 @@ def filter_article_by_category_id(request, category_id):
     articles = Article.objects.filter(category=category)
     context = {**info, "news": articles, "news_count": len(articles), }
     return render(request, 'news/catalog.html', context=context)
+
+
+
