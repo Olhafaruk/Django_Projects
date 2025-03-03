@@ -1,158 +1,64 @@
-
 body {
-    background-color: #fdf6e3; /* Base3 */
-    color: #657b83; /* Base00 */
+    background-color: #f8f9fa; /* Светлый фон для страницы */
+    color: #343a40; /* Темный цвет текста */
 }
+
 .navbar {
-    background-color: #073642; /* Base02 */
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
+    background-color: #343a40; /* Темный фон для навигационной панели */
 }
+
 .navbar-nav .nav-link {
-    color: #eee8d5; /* Base2 */
+    color: #ffffff; /* Белый цвет текста для ссылок в навигационной панели */
 }
+
 .navbar-nav .nav-link:hover {
-    color: #b58900; /* Yellow */
+    color: #ffc107; /* Желтый цвет текста при наведении */
 }
+
 .card {
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Отступ снизу для карточек */
 }
-.card-shadow {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+
+.footer {
+    background-color: #343a40; /* Темный фон для подвала */
+    color: #ffffff; /* Белый цвет текста для подвала */
+    text-align: center; /* Выравнивание текста по центру */
+    padding: 10px 0; /* Отступы сверху и снизу для подвала */
 }
-.card-shadow:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+.sidebar {
+    padding: 15px; /* Внутренний отступ для бокового меню */
+    margin-top: 138px; /* Отступ сверху для бокового меню */
 }
-.rubricator {
-    position: fixed;
-    left: 0;
-    top: 56px; /* Высота navbar */
-    bottom: 0;
-    width: 250px;
-    background-color: #002b36; /* Base03 */
-    overflow-y: auto;
-    border: none;
-}
+
 .main-content {
-    margin-left: 270px; /* 250px + 20px отступ */
-    padding-top: 70px; /* Высота navbar + отступ */
+    padding-left: 20px; /* Внутренний отступ слева для основного контента */
 }
-.btn-outline-secondary {
-    color: #657b83; /* Base00 */
-    border-color: #657b83; /* Base00 */
+
+/* Стили для кнопок тегов */
+.tag-button {
+    background-color: #d33682; /* Малиновый цвет фона */
+    color: #ffffff; /* Белый цвет текста */
+    border: none; /* Без границы */
+    padding: 5px 10px; /* Внутренние отступы для кнопки */
+    border-radius: 5px; /* Скругленные углы */
 }
-.btn-outline-secondary:hover {
-    background-color: #657b83; /* Base00 */
-    color: #fdf6e3; /* Base3 */
-}
-.btn-outline-success {
-    color: #2aa198; /* Cyan */
-    border-color: #2aa198; /* Cyan */
-}
-.btn-outline-success:hover {
-    background-color: #2aa198; /* Cyan */
-    color: #fdf6e3; /* Base3 */
-}
-.text-primary {
-    color: #268bd2 !important; /* Blue */
-}
-.text-secondary {
-    color: #93a1a1 !important; /* Base1 */
-}
-.text-success {
-    color: #859900 !important; /* Green */
-}
-.text-danger {
-    color: #dc322f !important; /* Red */
-}
-.text-warning {
-    color: #b58900 !important; /* Yellow */
-}
-.text-info {
-    color: #2aa198 !important; /* Cyan */
-}
-.text-light {
-    color: #eee8d5 !important; /* Base2 */
-}
-.text-dark {
-    color: #073642 !important; /* Base02 */
-}
-.bg-primary {
-    background-color: #268bd2 !important; /* Blue */
-}
-.bg-secondary {
-    background-color: #93a1a1 !important; /* Base1 */
-}
-.bg-success {
-    background-color: #859900 !important; /* Green */
-}
-.bg-danger {
-    background-color: #dc322f !important; /* Red */
-}
-.bg-warning {
-    background-color: #b58900 !important; /* Yellow */
-}
-.bg-info {
-    background-color: #2aa198 !important; /* Cyan */
-}
-.bg-light {
-    background-color: #eee8d5 !important; /* Base2 */
-}
-.bg-dark {
-    background-color: #073642 !important; /* Base02 */
+
+.tag-button:hover {
+    background-color: #b0306e; /* Темный серый цвет при наведении */
 }
 .navbar-brand {
-    background: linear-gradient(to right, #cb4b16, #d33682); /* Orange to Magenta */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #d33682; /* Малиновый цвет */
     font-weight: bold;
 }
-.hover-effect:hover {
-    background-color: #586e75; /* Base01 */
-    color: #eee8d5; /* Base2 */
-}
-.tag-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
-.tag-item {
-    background-color: #f1f1f1;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    padding: 5px 10px;
-    font-size: 14px;
-}
-.form-label {
-    font-weight: 500;
-    color: #2c3e50;
+.btn-primary {
+    background-color: #d33682; /* Малиновый цвет фона */
+    border-color: #d33682; /* Малиновый цвет границы */
+    color: #fdf6e3; /* Светлый цвет текста */
 }
 
-.form-control {
-    border-radius: 8px;
-    padding: 12px 15px;
-    border: 2px solid #e0e0e0;
-    transition: border-color 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: #3498db;
-    box-shadow: none;
-}
-
-/* Для ссылок рубрикатора при наведении */
-.rubricator a.list-group-item.list-group-item-action.hover-effect:hover {
-  background-color: #586e75 !important;
-  color: #eee8d5 !important;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.rubricator a.active-category {
-    background-color: #b58900 !important; /* Выделяющий фон */
-    color: #073642 !important;
-    transition: background-color 0.3s ease, color 0.3s ease;
+.btn-primary:hover {
+    background-color: #b0306e; /* Более темный малиновый цвет при наведении */
+    border-color: #b0306e; /* Более темный малиновый цвет границы при наведении */
+    color: #fdf6e3; /* Светлый цвет текста */
 }

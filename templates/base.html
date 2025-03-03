@@ -11,30 +11,8 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
-    <style>
-        body {
-            background-color: #f8f9fa;
-            color: #343a40;
-        }
-        .navbar {
-            background-color: #343a40;
-        }
-        .navbar-nav .nav-link {
-            color: #ffffff;
-        }
-        .navbar-nav .nav-link:hover {
-            color: #ffc107;
-        }
-        .card {
-            margin-bottom: 20px;
-        }
-        .footer {
-            background-color: #343a40;
-            color: #ffffff;
-            text-align: center;
-            padding: 10px 0;
-        }
-    </style>
+    <!-- Подключение файла main.css -->
+    <link rel="stylesheet" href="{% static 'news/css/main.css' %}">
 </head>
 <body>
 <header>
@@ -54,25 +32,33 @@
 </header>
 <main class="container mt-5">
     <div class="row">
-        {% if request.resolver_match.app_name == 'news' %}
-        <div class="col-md-3">
+        <div class="col-md-3 sidebar">
+            {% if request.resolver_match.app_name == 'news' %}
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Рубрикатор</h5>
                     <ul class="list-group">
                         {% for category in categories %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <a href="{% url 'news:get_news_by_category' category.id %}">{{ category.name }}</a>
+                                <a href="{% url 'news:get_news_by_category' category.id %}" class="tag-button">{{ category.name }}</a>
                                 <span class="badge bg-primary rounded-pill">{{ category.article_set.count }}</span>
                             </li>
                         {% endfor %}
                     </ul>
                 </div>
             </div>
+            {% endif %}
         </div>
-        {% endif %}
-        <div class="col-md-9">
+        <div class="col-md-9 main-content">
             {% block content %}
+                <!-- Пример блока статьи -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Пример статьи</h5>
+                        <p class="card-text">Текст статьи...</p>
+                        <a href="#" class="btn btn-primary">Подробнее</a>
+                    </div>
+                </div>
             {% endblock %}
         </div>
     </div>
@@ -90,3 +76,5 @@
 ></script>
 </body>
 </html>
+
+
