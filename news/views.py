@@ -1,7 +1,11 @@
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .models import Tag, Category, Article
 from django.db.models import  Count
+from django.db.models import F, Q
+
+
 """
 Информация в шаблоны будет браться из базы данных
 Но пока, мы сделаем переменные, куда будем записывать информацию, которая пойдет в контекст шаблона
@@ -60,7 +64,11 @@ def get_news_by_category(request, category_id):
     """
     category = get_object_or_404(Category, pk=category_id)
     articles = Article.objects.filter(category=category)
-    context = {**info, 'news': articles, 'news_count': len(articles), "categories": get_categories_with_news_count()}
+    #context = {**info, 'news': articles, 'news_count': len(articles), "categories": get_categories_with_news_count()}
+    paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, }
     return render(request, 'news/catalog.html', context=context)
 
 def get_news_by_tag(request, tag_id):
@@ -69,7 +77,11 @@ def get_news_by_tag(request, tag_id):
     """
     tag = get_object_or_404(Tag, pk=tag_id)
     articles = Article.objects.filter(tags=tag)
-    context = {**info, 'news': articles, 'news_count': len(articles)}
+    #context = {**info, 'news': articles, 'news_count': len(articles)}
+    paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, }
     return render(request, 'news/catalog.html', context=context)
 
 def get_category_by_name(request, slug):
@@ -102,8 +114,11 @@ def get_all_news(request):
 
     articles = Article.objects.select_related('category').prefetch_related('tags').order_by(order_by)
 
-    context = {**info, 'news': articles, 'news_count': len(articles), }
-
+    #context = {**info, 'news': articles, 'news_count': len(articles), }
+    paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, }
     return render(request, 'news/catalog.html', context=context)
 
 def get_detail_article_by_id(request, article_id):
@@ -111,6 +126,8 @@ def get_detail_article_by_id(request, article_id):
     Возвращает детальную информацию по новости для представления
     """
     article = get_object_or_404(Article, id=article_id)
+    Article.objects.filter(pk=article_id).update(views=F("views") + 1)
+    article.refresh_from_db() # Обновить объект article из базы данных
     context = {**info, 'article': article}
     return render(request, 'news/article_detail.html', context=context)
 
@@ -135,4 +152,15 @@ def filter_article_by_category_id(request, category_id):
     return render(request, 'news/catalog.html', context=context)
 
 
+def search_news(request):
+    query = request.GET.get('q')
+    articles = Article.objects.filter(
+            Q(title__icontains=query) | Q(content__icontains=query)
+        )
+    paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, }
+    #context = {**info, 'news': articles, 'news_count': len(articles), 'query': query}
+    return render(request, 'news/catalog.html', context=context)
 

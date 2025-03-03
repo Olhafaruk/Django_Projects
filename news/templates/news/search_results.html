@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Результаты поиска{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Результаты поиска</h1>
+    {% if articles %}
+        <ul class="list-group">
+            {% for article in articles %}
+                <li class="list-group-item">
+                    <h5>{{ article.title }}</h5>
+                    <p>{{ article.content|truncatewords:30 }}</p>
+                    <a href="{% url 'news:article_detail' article.id %}" class="btn btn-primary">Читать далее</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Нет результатов по вашему запросу.</p>
+    {% endif %}
+</div>
+{% endblock %}

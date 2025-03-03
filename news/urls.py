@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-
+from .views import search_news
 
 app_name = 'news'
 
@@ -12,4 +12,5 @@ urlpatterns = [
     path('tag/<int:tag_id>/', views.filter_news_by_tag_id, name='filter_news_by_tag'),
     path('category/<int:category_id>/', views.filter_article_by_category_id, name='filter_article_by_category_id'),
     path('category/<int:category_id>/', views.get_news_by_category, name='get_news_by_category'),
+    path('search/', search_news, name='search_news'),
 ]
