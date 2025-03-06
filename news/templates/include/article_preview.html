@@ -10,7 +10,18 @@
         {% endfor %}
         <p class="card-text"><small class="text-muted"><i class="bi bi-calendar"></i> {{ article.publication_date }}</small></p>
         <p class="card-text"><i class="bi bi-eye-fill"></i> {{ article.views }}</p>
-        <p class="card-text"><i class="bi bi-heart-fill"></i> {{ article.likes.count }}</p> <! --Добавлена иконка сердца + count >
+        <p class="card-text"><i class="bi bi-heart-fill"></i> {{ article.likes.count }}</p>
         <a href="{% url 'news:detail_article_by_id' article.id %}" class="btn btn-outline-secondary">Подробнее</a>
+        <form method="POST" action="{% url 'news:toggle_favorite' article.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    {% if article|has_favorited:user_ip %}
+                        Убрать из избранного
+                    {% else %}
+                        Добавить в избранное
+                    {% endif %}
+                </button>
+            </form>
+
     </div>
 </div>

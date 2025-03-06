@@ -1,11 +1,10 @@
 {% extends "base.html" %}
-{% load upper_words %}
-{% load customtags %} <! -- для загрузки пользовательских тегов -- >
+{% load customtags %}
 {% block content %}
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">{% upper_words article.title %}</h5>
-            <p class="card-text">{{ article.content }}</p>
+            <h5 class="card-title">{{ article.title }}</h5>
+           <p class="card-text">{{ article.content }}</p>
             <p class="card-text"><a href="{% url 'news:get_news_by_category' article.category.id %}" class="text-
             decoration-none text-primary fw-bold">{{ article.category }}</a></p>
             {% for tag in article.tags.all %}
@@ -14,11 +13,6 @@
             <p class="card-text"><small class="text-muted"><i class="bi bi-calendar"></i> {{ article.publication_date }}</small></p>
             <p class="card-text"><i class="bi bi-eye-fill"></i> {{ article.views }}</p>
             <p class="card-text"><i class="bi bi-heart-fill"></i> {{ article.likes.count }}</p>
-
-            <! -- добавлена иконка
-            сердца `<i class="bi bi-heart-fill"></i>` и изменено отображение количества лайков с
-            `article.favorites_count` на `article.likes.count` -- >
-
             <form method="POST" action="{% url 'news:toggle_like' article.id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">

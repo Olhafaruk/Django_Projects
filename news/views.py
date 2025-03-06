@@ -4,7 +4,7 @@ from django.core.paginator import Paginator
 from django.db.models import F, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render #для использования в представлениях
-from .models import Article, Category, Like, Tag
+from .models import Article, Favorite, Category, Like, Tag
 from django.db.models import Count
 
 
@@ -27,11 +27,31 @@ info = {
         {"title": "Каталог",
          "url": "/news/catalog/",
          "url_name": "news:catalog"},
+        {"title": "Избранное",
+         "url": "/news/favorites/",
+         "url_name": "news:favorites"},
     ],
 }
-#обрабатывает запросы на добавление или удаление лайков на статьи. Функция получает IP-адрес пользователя и статью,
-# проверяет наличие лайка и создает или удаляет лайк в зависимости от состояния. После этого происходит перенаправление
-# на страницу статьи
+def favorites(request):
+    ip_address = request.META.get('REMOTE_ADDR')
+    favorite_articles = Article.objects.filter(favorites__ip_address=ip_address)
+    print(f'Favorite articles for IP {ip_address}: {favorite_articles}')
+    context = {**info,
+               'news': favorite_articles,
+               'news_count': len(favorite_articles),
+               'page_obj': favorite_articles,
+               'user_ip': request.META.get('REMOTE_ADDR'), }
+    return render(request, 'news/catalog.html', context=context)
+
+def toggle_favorite(request, article_id):
+    article = get_object_or_404(Article, pk=article_id)
+    ip_address = request.META.get('REMOTE_ADDR')
+    favorite, created = Favorite.objects.get_or_create(article=article, ip_address=ip_address)
+    if not created:
+        favorite.delete()
+    return redirect('news:detail_article_by_id', article_id=article_id)
+
+
 def toggle_like(request, article_id):
     article = get_object_or_404(Article, pk=article_id)
     ip_address = request.META.get("REMOTE_ADDR")

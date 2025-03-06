@@ -13,5 +13,8 @@ urlpatterns = [
     path('category/<int:category_id>/', views.filter_article_by_category_id, name='filter_article_by_category_id'),
     path('category/<int:category_id>/', views.get_news_by_category, name='get_news_by_category'),
     path('search/', search_news, name='search_news'),
-    path('like/<int:article_id>/', views.toggle_like, name='toggle_like') #для обработки запросов на добавление или удаление лайков на статьи
+    path('like/<int:article_id>/', views.toggle_like, name='toggle_like'),
+    path("favorite/<int:article_id>/", views.toggle_favorite, name="toggle_favorite"),
+    path('favorites/', views.favorites, name='favorites'),
+
 ]
