@@ -1,9 +1,11 @@
+from ipaddress import ip_address
+
 from django.core.paginator import Paginator
-from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
-from .models import Tag, Category, Article
-from django.db.models import  Count
 from django.db.models import F, Q
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render #для использования в представлениях
+from .models import Article, Category, Like, Tag
+from django.db.models import Count
 
 
 """
@@ -13,7 +15,7 @@ from django.db.models import F, Q
 # Пример данных для новостей
 info = {
     "users_count": 5,
-    "news_count": 10,
+    "news_count": len(Article.objects.all()),
     "categories": Category.objects.all(),
     "menu": [
         {"title": "Главная",
@@ -27,6 +29,17 @@ info = {
          "url_name": "news:catalog"},
     ],
 }
+#обрабатывает запросы на добавление или удаление лайков на статьи. Функция получает IP-адрес пользователя и статью,
+# проверяет наличие лайка и создает или удаляет лайк в зависимости от состояния. После этого происходит перенаправление
+# на страницу статьи
+def toggle_like(request, article_id):
+    article = get_object_or_404(Article, pk=article_id)
+    ip_address = request.META.get("REMOTE_ADDR")
+    like, created = Like.objects.get_or_create(article=article, ip_address=ip_address)
+    if not created:
+        like.delete()
+    return redirect('news:detail_article_by_id', article_id=article_id)
+
 
 def get_categories_with_news_count():
     categories = Category.objects.all().annotate(news_count=Count('article'))
@@ -68,7 +81,11 @@ def get_news_by_category(request, category_id):
     paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, }
+    #context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, }
+    #добавлен параметр `user_ip`, который содержит IP-адрес пользователя. Это изменение сделано для передачи IP-адреса
+    # пользователя в шаблоны, что позволяет корректно отображать состояние лайка.
+    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj,
+               'user_ip': request.META.get('REMOTE_ADDR'), }
     return render(request, 'news/catalog.html', context=context)
 
 def get_news_by_tag(request, tag_id):
@@ -118,7 +135,9 @@ def get_all_news(request):
     paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, }
+    #context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, }
+    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj,
+               'user_ip': request.META.get('REMOTE_ADDR'), }
     return render(request, 'news/catalog.html', context=context)
 
 def get_detail_article_by_id(request, article_id):
@@ -136,7 +155,8 @@ def get_detail_article_by_title(request, title):
     Возвращает детальную информацию по новости для представления
     """
     article = get_object_or_404(Article, slug=title)
-    context = {**info, 'article': article}
+    #context = {**info, 'article': article}
+    context = {**info, 'article': article, 'user_ip': request.META.get('REMOTE_ADDR'), }
     return render(request, 'news/article_detail.html', context=context)
 
 def filter_news_by_tag_id(request, tag_id):
@@ -160,7 +180,9 @@ def search_news(request):
     paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, }
+    #context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, }
     #context = {**info, 'news': articles, 'news_count': len(articles), 'query': query}
+    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj,
+               'user_ip': request.META.get('REMOTE_ADDR'), }
     return render(request, 'news/catalog.html', context=context)
 

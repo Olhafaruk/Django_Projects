@@ -87,3 +87,11 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+class Like(models.Model):
+    #поля `article` (ссылка на статью) и `ip_address` (IP-адрес пользователя, поставившего лайк)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="likes")
+    ip_address = models.GenericIPAddressField()
+
+    def __str__(self):
+        return f"Like by {self.ip_address} on {self.article}"
