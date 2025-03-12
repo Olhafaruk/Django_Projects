@@ -58,6 +58,13 @@ class Article(models.Model):
                                  choices=(map(lambda x: (bool(x[0]), x[1]), Status.choices)),
                                  verbose_name='Проверено')
 
+    image = models.ImageField(
+        upload_to='articles/%Y/%m/%d/',
+        blank=True,
+        null=True,
+        verbose_name='Изображение'
+    )
+
     objects = ArticleManager()
     all_objects = AllArticleManager()
 
