@@ -183,15 +183,10 @@ def get_detail_article_by_title(request, title):
 
 def add_article(request):
     if request.method == "POST":
-        form = ArticleForm(request.POST)
+        form = ArticleForm(request.POST, request.FILES)
         if form.is_valid():
-            title = form.cleaned_data["title"]
-            content = form.cleaned_data["content"]
-            category = form.cleaned_data["category"]
-            article = Article(title=title, content=content, category=category)
-            article.save()
-            article_id = article.pk
-            return HttpResponseRedirect(f"/news/catalog/{article_id}")
+            article = form.save()
+            return redirect('news:detail_article_by_id', article_id=article.id)
     else:
         form = ArticleForm()
         context = {"form": form, "menu": info["menu"]}
