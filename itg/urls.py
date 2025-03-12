@@ -11,8 +11,7 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('news/', include('news.urls', namespace='news')),
     path('news/', include('news.urls')),
-]
-static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     import debug_toolbar

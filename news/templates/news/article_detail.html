@@ -6,14 +6,15 @@
          <div class="card-body">
              <h5 class="card-title">{{ article.title }}</h5>
              <!-- Изображение -->
-         {% if article.image %}
-         <div class="article-image mb-5">
-             <img src="{{ article.image.url }}"
-                  alt="{{ article.title }}"
-                  class="img-fluid rounded-3 shadow"
-                  loading="lazy">
-         </div>
-         {% endif %}
+              {% if article.image %}
+             <div class="article-image mb-5">
+                 <img src="{{ article.image.url }}"
+                      alt="{{ article.title }}"
+                      class="img-fluid rounded-3 shadow"
+                      loading="lazy">
+             </div>
+             {% endif %}
+             <!-- Содержание -->
              <p class="card-text">{{ article.content }}</p>
              <p class="card-text"><a href="{% url 'news:get_news_by_category' article.category.id %}" class="text-
              decoration-none text-primary fw-bold category-link">{{ article.category }}</a></p>
@@ -48,5 +49,15 @@
              </p>
 
          </div>
+     </div>
+<div class="mt-4 border-top pt-3">
+         <a href="{% url 'news:article_update' article.id %}"
+            class="btn btn-warning">
+            <i class="bi bi-pencil-square"></i> Редактировать
+         </a>
+         <a href="{% url 'news:article_delete' article.id %}"
+            class="btn btn-danger">
+            <i class="bi bi-trash"></i> Удалить
+         </a>
      </div>
 {% endblock %}
