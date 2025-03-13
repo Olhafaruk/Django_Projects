@@ -1,26 +1,34 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container mt-4">
-     <h1 class="mb-4">Добавить новую статью</h1>
-
-     <form method="post" enctype="multipart/form-data">
+     <div class="d-flex justify-content-between align-items-center mb-4">
+         <h1 class="mb-0">Добавить новую статью</h1>
+         <a href="{% url 'news:upload_json' %}" class="btn btn-success">
+             <i class="bi bi-upload"></i> Загрузить новости из JSON
+         </a>
+     </div>
+    {% if errors %}
+         <div class="alert alert-danger">
+             <ul>
+                 {% for error in errors %}
+                     <li>{{ error }}</li>
+                 {% endfor %}
+             </ul>
+         </div>
+     {% endif %}
+         <form method="post" enctype="multipart/form-data">
          {% csrf_token %}
          <!-- Поле для изображения -->
-         <div class="form-group mb-4">
-             <label class="form-label fw-bold">Обложка статьи:</label>
-             <div class="custom-file">
-                 {{ form.image }}
-                 <label class="custom-file-label" for="{{ form.image.id_for_label }}">
-                     Выберите файл (JPEG, PNG)
-                 </label>
-             </div>
-            <small class="form-text text-muted">
+         <div class="mb-3">
+             <label for="{{ form.image.id_for_label }}" class="form-label fw-bold">Обложка статьи:</label>
+             {{ form.image }}
+           <small class="form-text text-muted">
                  Максимальный размер файла: 5 МБ
              </small>
          </div>
          <!-- Основные поля формы -->
-         <div class="form-group mb-4">
-             <label class="form-label fw-bold">Заголовок:</label>
+         <div class="mb-3">
+             <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">Заголовок:</label>
              {{ form.title }}
              {% if form.title.errors %}
                  <div class="alert alert-danger mt-2">
@@ -28,8 +36,8 @@
                  </div>
              {% endif %}
          </div>
-            <div class="form-group mb-4">
-             <label class="form-label fw-bold">Текст статьи:</label>
+            <div class="mb-3">
+             <label for="{{ form.content.id_for_label }}" class="form-label fw-bold">Текст статьи:</label>
              {{ form.content }}
              {% if form.content.errors %}
                  <div class="alert alert-danger mt-2">
@@ -37,17 +45,27 @@
                  </div>
              {% endif %}
          </div>
-         <div class="row mb-4">
-             <div class="col-md-6">
-                 <div class="form-group">
-                     <label class="form-label fw-bold">Категория:</label>
-                     {{ form.category }}
+
+            <div class="mb-3">
+             <label for="{{ form.category.id_for_label }}" class="form-label fw-bold">Категория:</label>
+             {{ form.category }}
+         </div>
+         <div class="mb-3">
+             <label for="{{ form.tags.id_for_label }}" class="form-label fw-bold">Теги:</label>
+            <div class="row">
+                 <div class="col-md-6">
+                     {% for tag in form.tags %}
+                         {% if forloop.counter0|divisibleby:2 %}
+                             {{ tag }}<br>
+                         {% endif %}
+                     {% endfor %}
                  </div>
-             </div>
-             <div class="col-md-6">
-                 <div class="form-group">
-                     <label class="form-label fw-bold">Теги:</label>
-                     {{ form.tags }}
+                 <div class="col-md-6">
+                     {% for tag in form.tags %}
+                         {% if not forloop.counter0|divisibleby:2 %}
+                             {{ tag }}<br>
+                         {% endif %}
+                     {% endfor %}
                  </div>
              </div>
          </div>
@@ -60,6 +78,6 @@
              </a>
          </div>
      </form>
- </div>
 
+ </div>
  {% endblock %}

@@ -23,3 +23,7 @@ def random_color(tag):
     # Генерируем уникальный цвет для каждого тега на основе его ID
     random.seed(tag.id)
     return f'#{random.randint(0, 0xFFFFFF):06x}'
+
+@register.filter
+def add(value, arg):
+    return int(value) + int(arg)
