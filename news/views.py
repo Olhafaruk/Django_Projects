@@ -1,4 +1,6 @@
 import json
+from ipaddress import ip_address
+from venv import create
 
 from django.core.paginator import Paginator
 from django.db.models import F, Q
@@ -6,6 +8,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import Article, Favorite, Category, Like, Tag
 from .forms import ArticleForm, ArticleUploadForm
+from django.views import View
+from django.views.generic import ListView, TemplateView
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import FormView
 
 import unidecode
 from django.db import models
@@ -36,26 +42,24 @@ info = {
 }
 
 
-def upload_json_view(request):
-    if request.method == 'POST':
-        form = ArticleUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            json_file = form.cleaned_data['json_file']
-            try:
-                data = json.load(json_file)
-                errors = form.validate_json_data(data)
-                if errors:
-                    return render(request, 'news/upload_json.html', {'form': form, 'errors': errors})
-                    # Сохраняем данные в сессию для последовательного просмотра
-                request.session['articles_data'] = data
-                request.session['current_index'] = 0
-                return redirect('news:edit_article_from_json', index=0)
-            except json.JSONDecodeError:
-                return render(request, 'news/upload_json.html', {'form': form, 'error': 'Неверный формат JSON-файла'})
-    else:
-        form = ArticleUploadForm()
-    return render(request, 'news/upload_json.html', {'form': form})
+class UploadJsonView(FormView):
+    template_name = 'news/upload_json.html'
+    form_class = ArticleUploadForm
+    success_url = '/news/catalog/'
 
+    def form_valid(self, form):
+        json_file = form.cleaned_data['json_file']
+        try:
+            data = json.load(json_file)
+            errors = form.validate_json_data(data)
+            if errors:
+                return self.form_invalid(form)
+            self.request.session['articles_data'] = data
+            self.request.session['current_index'] = 0
+            return redirect('news:edit_article_from_json', index=0)
+        except json.JSONDecodeError:
+            form.add_error(None, 'Неверный формат JSON-файла')
+            return self.form_invalid(form)
 
 def edit_article_from_json(request, index):
     articles_data = request.session.get('articles_data', [])
@@ -124,44 +128,62 @@ def save_article(article_data, form=None):
             article.tags.add(tag)
     return article
 
-def favorites(request):
-    ip_address = request.META.get('REMOTE_ADDR')
-    favorite_articles = Article.objects.filter(favorites__ip_address=ip_address)
-    context = {**info, 'news': favorite_articles, 'news_count': len(favorite_articles), 'page_obj':
-        favorite_articles, 'user_ip': request.META.get('REMOTE_ADDR'), }
-    return render(request, 'news/catalog.html', context=context)
+class FavoritesView(ListView):
+    model = Article
+    template_name = 'news/catalog.html'
+    context_object_name = 'news'
+    paginate_by = 20
 
-def toggle_favorite(request, article_id):
-    article = get_object_or_404(Article, pk=article_id)
-    ip_address = request.META.get('REMOTE_ADDR')
-    favorite, created = Favorite.objects.get_or_create(article=article, ip_address=ip_address)
-    if not created:
-        favorite.delete()
-    return redirect('news:detail_article_by_id', article_id=article_id)
+    def get_queryset(self):
+        ip_address = self.request.META.get('REMOTE_ADDR')
+        return Article.objects.filter(favorites__ip_address=ip_address)
 
-def toggle_like(request, article_id):
-    article = get_object_or_404(Article, pk=article_id)
-    ip_address = request.META.get('REMOTE_ADDR')
-    like, created = Like.objects.get_or_create(article=article, ip_address=ip_address)
-    if not created:
-        like.delete()
-    return redirect('news:detail_article_by_id', article_id=article_id)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(info)
+        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
+        return context
 
 
-def search_news(request):
-    query = request.GET.get('q')
-    categories = Category.objects.all()
-    if query:
-        articles = Article.objects.filter(Q(title__icontains=query) | Q(content__icontains=query))
-    else:
-        articles = Article.objects.all()
+class ToggleFavoriteView(View):
+    def post(self, request, article_id, *args, **kwargs):
+        article = get_object_or_404(Article, pk=article_id)
+        ip_address = request.META.get("REMOTE_ADDR")
+        favorite, created = Favorite.objects.get_or_create(article=article, ip_address=ip_address)
+        if not created:
+            favorite.delete()
+        return redirect('news:detail_article_by_id', pk=article_id)
 
-    paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj,
-               'user_ip': request.META.get('REMOTE_ADDR'), }
-    return render(request, 'news/catalog.html', context=context)
+class ToggleLikeView(View):
+    def post(self, request, article_id, *args, **kwargs):
+        article = get_object_or_404(Article, pk=article_id)
+        ip_address = request.META.get('REMOTE_ADDR')
+        like, created = Like.objects.get_or_create(article=article, ip_address=ip_address)
+        if not created:
+            like.delete()
+        return redirect('news:detail_article_by_id', pk=article_id)
+
+
+
+class SearchNewsView(ListView):
+    model = Article
+    template_name = 'news/catalog.html'
+    context_object_name = 'news'
+    paginate_by = 20
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query:
+            return Article.objects.filter(Q(title__icontains=query) | Q(content__icontains=query))
+        return Article.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(info)
+        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
+        return context
+
+
 
 
 def main(request):
@@ -171,9 +193,8 @@ def main(request):
     return render(request, 'main.html', context=info)
 
 
-def about(request):
-    """Представление рендерит шаблон about.html"""
-    return render(request, 'about.html', context=info)
+class AboutView(TemplateView):
+       template_name = "about.html"
 
 
 def catalog(request):
@@ -187,28 +208,43 @@ def get_categories(request):
     return HttpResponse('All categories')
 
 
-def get_news_by_category(request, category_id):
-    category = get_object_or_404(Category, pk=category_id)
-    articles = Article.objects.filter(category=category)
+class GetNewsByCategoryView(ListView):
+        model = Article
+        template_name = "news/catalog.html"
+        context_object_name = "news"
+        paginate_by = 20
 
-    paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj,
-               'user_ip': request.META.get('REMOTE_ADDR'), }
-    return render(request, 'news/catalog.html', context=context)
+        def get_queryset(self):
+            category_id = self.kwargs["category_id"]
+            category = get_object_or_404(Category, pk=category_id)
+            return Article.objects.filter(category=category)
 
 
-def get_news_by_tag(request, tag_id):
-    tag = get_object_or_404(Tag, pk=tag_id)
-    articles = Article.objects.filter(tags=tag)
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context.update(info)
+            context['user_ip'] = self.request.META.get('REMOTE_ADDR')
+            return context
 
-    paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, }
 
-    return render(request, 'news/catalog.html', context=context)
+class GetNewsByTagView(ListView):
+    model = Article
+    template_name = "news/catalog.html"
+    context_object_name = "news"
+    paginate_by = 20
+
+    def get_queryset(self):
+        tag_id = self.kwargs["tag_id"]
+        tag = get_object_or_404(Tag, pk=tag_id)
+        return Article.objects.filter(tags=tag)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(info)
+        context["user_ip"] = self.request.META.get("REMOTE_ADDR")
+        return context
+
+
 
 
 def get_category_by_name(request, slug):
@@ -250,33 +286,45 @@ def get_all_news(request):
                'user_ip': request.META.get('REMOTE_ADDR'), }
     return render(request, 'news/catalog.html', context=context)
 
+class ArticleDetailView(DetailView):
+    model = Article
+    template_name = 'news/article_detail.html'
+    context_object_name = 'article'
 
-def get_detail_article_by_id(request, article_id):
-    """
-    Возвращает детальную информацию по новости для представления
-    """
-    article = get_object_or_404(Article, pk=article_id)
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        article = self.get_object()
+        viewed_articles = request.session.get('viewed_articles', [])
+        if article.id not in viewed_articles:
+            article.views += 1
+            article.save()
+            viewed_articles.append(article.id)
+            request.session['viewed_articles'] = viewed_articles
+        return response
 
-    # Увеличиваем счетчик просмотров только один раз за сессию для каждой новости
-    viewed_articles = request.session.get('viewed_articles', [])
-    if article_id not in viewed_articles:
-        article.views += 1
-        article.save()
-        viewed_articles.append(article_id)
-        request.session['viewed_articles'] = viewed_articles
-
-    context = {**info, 'article': article}
-
-    return render(request, 'news/article_detail.html', context=context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(info)
+        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
+        return context
 
 
 def get_detail_article_by_title(request, title):
-
     article = get_object_or_404(Article, slug=title)
 
     context = {**info, 'article': article, 'user_ip': request.META.get('REMOTE_ADDR'), }
 
     return render(request, 'news/article_detail.html', context=context)
+
+
+
+
+
+
+
+
+
+
 
 def add_article(request):
     if request.method == "POST":
