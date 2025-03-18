@@ -5,9 +5,11 @@ from django.urls import path, include
 from itg import settings
 from news import views
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.main, name='index'),
+    path('', views.MainView.as_view(), name='index'),
     path('about/', views.AboutView.as_view(), name='about'),
     path('news/', include('news.urls', namespace='news')),
     path('news/', include('news.urls')),
