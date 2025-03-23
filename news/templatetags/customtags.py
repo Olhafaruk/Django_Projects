@@ -1,4 +1,4 @@
-import random
+import os, random
 
 from django.contrib.admin import register
 from django import template
@@ -23,6 +23,10 @@ def random_color(tag):
     # Генерируем уникальный цвет для каждого тега на основе его ID
     random.seed(tag.id)
     return f'#{random.randint(0, 0xFFFFFF):06x}'
+
+@register.filter
+def basename(value):
+    return os.path.basename(value)
 
 @register.filter
 def add(value, arg):
