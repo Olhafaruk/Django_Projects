@@ -1,3 +1,4 @@
+from IPython.core.release import author
 from django.contrib import admin
 from django.utils.html import format_html
 from django.contrib.admin import SimpleListFilter
@@ -36,7 +37,7 @@ class TagInline(admin.TabularInline):
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
     # list_display отображает поля в таблице
-    list_display = ('pk', 'title', 'category', 'publication_date', 'views', 'status', 'is_active', 'has_spiders')
+    list_display = ('pk', 'title', 'category', 'publication_date', 'views', 'status', 'is_active', 'has_spiders', "author")
     # list_display_links позволяет указать в качестве ссылок на объект другие поля
     list_display_links = ('pk',)
     # list_filter позволяет фильтровать по полям
@@ -57,7 +58,7 @@ class ArticleAdmin(admin.ModelAdmin):
 
     # fieldsets позволяет выбирать группы полей (не работает с fields)
     fieldsets = (
-        ('Главная информация', {'fields': ('title', 'content')}),
+        ('Главная информация', {'fields': ('title', 'content', "author")}),
         ('Настройки фильтрации', {'fields': ('category', 'is_active', 'status')}),
         ('Доп. инфо', {'fields': ('views', 'slug')}),
     )
