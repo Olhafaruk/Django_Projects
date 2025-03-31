@@ -1,27 +1,30 @@
 <ul class="navbar-nav">
-    {% for item in menu %}
-        <li class="nav-item">
-            <a class="nav-link" href="{% url item.url_name %}">{{ item.title }}</a>
-        </li>
-        {% if not forloop.last %}
-            <li class="nav-item"><hr class="dropdown-divider"/></li>
-        {% endif %}
-    {% endfor %}
-</ul>
-<ul class="navbar-nav"> <!-- Элементы правой части без выравнивания по левому краю -->
+     {% for item in menu %}
+         <li class="nav-item">
+             <a class="nav-link" href="{% url item.url_name %}">{{ item.title }}</a>
+         </li>
+         {% if not forloop.last %}
+             <li class="nav-item"><hr class="dropdown-divider"/></li>
+         {% endif %}
+     {% endfor %}
+ </ul>
+ <ul class="navbar-nav"> <!-- Элементы правой части без выравнивания по левому краю -->
      {% if user.is_authenticated %}
          <li class="nav-item">
            <a class="nav-link" href="#">Привет, {{ user.username }}!</a>
          </li>
          <li class="nav-item">
-           <a class="nav-link" href="{% url 'users:logout' %}">Выйти</a>
+            <form method="post" action="{% url 'account_logout' %}">
+             {% csrf_token %}
+             <button type="submit" class="btn btn-link nav-link">Выйти</button>
+           </form>
          </li>
      {% else %}
          <li class="nav-item">
-           <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
+           <a class="nav-link" href="{% url 'account_login' %}">Войти</a>
          </li>
          <li class="nav-item">
-           <a class="nav-link" href="{% url 'users:signup' %}">Регистрация</a>
+          <a class="nav-link" href="{% url 'account_signup' %}">Регистрация</a>
          </li>
      {% endif %}
  </ul>
