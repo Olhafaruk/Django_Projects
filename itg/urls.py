@@ -12,7 +12,7 @@ urlpatterns = [
                   path('', views.MainView.as_view(), name='index'),
                   path('about/', views.AboutView.as_view(), name='about'),
                   path('news/', include('news.urls', namespace='news')),
-                 path('users/', include('users.urls', namespace='users')),
+                  path('users/', include('users.urls', namespace='users')),
 
 
                   # Общие URL allauth

@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Q
 from django.utils.text import slugify
+from django.urls import reverse
+
 
 
 class ArticleQuerySet(models.QuerySet):
@@ -124,13 +126,12 @@ class Article(models.Model):
         db_table = 'Articles'  # без указания этого параметра, таблица в БД будет называться 'news_artcile'
         verbose_name = 'Статья'  # единственное число для отображения в админке
         verbose_name_plural = 'Статьи'  # множественное число для отображения в админке
-        # ordering = ['publication_date']  # указывает порядок сортировки модели по умолчанию
-        # unique_together = (...)  # устанавливает уникальность для комбинации полей
-        # index_together = (...)  # создаёт для нескольких полей
-        # indexes = (...)  # определяет пользовательские индексы
-        # abstract = True/False  # делает модель абстрактной, не создаёт таблицу БД, нужна только для наследования другими моделями данных
-        # managed = True/False  # будет ли эта модель управляться (создание, удаление, изменение) с помощью Django или нет
-        # permissions = [...]  # определяет пользовательские разрешения для модели
+
+    objects = ArticleManager()
+    all_objects = AllArticleManager()
+
+    def get_absolute_url(self):
+        return reverse('news:detail_article_by_id', kwargs={'pk': self.pk})
 
     def __str__(self):
         return self.title
@@ -149,3 +150,38 @@ class Favorite(models.Model): #отслеживает избранные ста�
 
     def __str__(self):
         return f"Favorite by {self.ip_address} on {self.article}"
+
+
+class ArticleHistory(models.Model):
+    article = models.ForeignKey('Article', on_delete=models.CASCADE, related_name='history')
+    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True,
+                             related_name='article_history')
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.article.title} — {self.timestamp.strftime('%d %b %Y %H:%M')}"
+
+
+class ArticleHistoryDetail(models.Model):
+    history = models.ForeignKey(ArticleHistory, on_delete=models.CASCADE, related_name='details')
+    field_name = models.CharField(max_length=100)  # например, title, category, tags и т.д.
+    old_value = models.TextField(blank=True, null=True)
+    new_value = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.field_name}: {self.old_value} → {self.new_value}"
+
+
+class Comment(models.Model):
+    article = models.ForeignKey('Article', on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True,
+                             related_name='comments')
+    content = models.TextField(verbose_name="Комментарий")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Комментарий от {self.user or 'Аноним'} на {self.article.title}"
+
+    class Meta:
+        ordering = ('created_at',)
