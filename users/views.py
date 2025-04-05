@@ -51,7 +51,7 @@ class ProfileActivityView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Здесь  можете получить историю действий пользователя, например,
-        # из логов или специальной модели истории
+        # Загрузка истории изменений, связанных с текущим пользователем
+        context['histories'] = ArticleHistory.objects.filter(user=self.request.user).order_by('-timestamp')
         context['active_tab'] = 'activity'
         return context
