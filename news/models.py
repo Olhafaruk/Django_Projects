@@ -1,5 +1,6 @@
 import unidecode
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Q
@@ -185,3 +186,76 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('created_at',)
+
+
+# Модель для подписки пользователей на авторов
+class UserSubscription(models.Model):
+    """
+    Модель для управления подписками пользователей (subscriber)
+    на других пользователей, которые являются авторами статей (author).
+    """
+    # Поле для подписчика (ссылается на модель пользователя)
+    subscriber = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  # Используем модель пользователя, определённую в настройках Django.
+        on_delete=models.CASCADE,  # Если пользователь-читатель удаляется, удаляются все его подписки.
+        related_name="subscribed_authors",  # Позволяет доступ к подписанным авторам через user.subscribed_authors.
+    )
+
+    # Поле для автора, на которого подписываются
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  # Используем ту же модель пользователя.
+        on_delete=models.CASCADE,  # Если пользователь-автор удаляется, удаляются все связанные подписки.
+        related_name="followers",  # Позволяет получить всех подписчиков автора через user.followers.
+    )
+
+    # Дата создания записи подписки
+    created_at = models.DateTimeField(auto_now_add=True)  # Автоматически устанавливается при создании записи.
+
+    class Meta:
+        # Уникальность подписки: одна подписка между subscriber и author
+        unique_together = ("subscriber", "author")
+        verbose_name = "Подписка на автора"  # Название в админке (единственное число).
+        verbose_name_plural = "Подписки на авторов"  # Название во множественном числе.
+
+    def __str__(self):
+        """
+        Возвращает удобное строковое представление подписки для чтения.
+        Пример: "user1 → user2".
+        """
+        return f"{self.subscriber} → {self.author}"
+
+
+# Модель для подписки пользователей на теги
+class TagSubscription(models.Model):
+    """
+    Модель для управления подписками пользователей (subscriber)
+    на интересующие их теги (tag).
+    """
+    # Поле для подписчика
+    subscriber = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  # Используем модель пользователя из настроек.
+        on_delete=models.CASCADE,  # Удаление подписчика влечёт удаление всех его подписок.
+        related_name="subscribed_tags",  # Доступ к подпискам на теги через user.subscribed_tags.
+    )
+
+    # Поле для тега, на который пользователь подписывается
+    tag = models.ForeignKey(
+        "Tag",  # Ссылка на модель тегов.
+        on_delete=models.CASCADE,  # Удаление тега влечёт удаление всех подписок на него.
+    )
+
+    # Дата создания записи подписки
+    created_at = models.DateTimeField(auto_now_add=True)  # Дата автоматически проставляется при создании подписки.
+
+    class Meta:
+        # Уникальность подписки: одна подписка между subscriber и tag
+        unique_together = ("subscriber", "tag")
+        verbose_name = "Подписка на тег"  # Название в админке (единственное число).
+        verbose_name_plural = "Подписки на теги"  # Название во множественном числе.
+
+    def __str__(self):
+        """
+        Возвращает удобное строковое представление подписки на тег.
+        Пример: "user1 → #TagName".
+        """
+        return f"{self.subscriber} → #{self.tag}"

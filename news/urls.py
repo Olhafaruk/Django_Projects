@@ -19,4 +19,10 @@ urlpatterns = [
      path('delete/<int:pk>/', views.ArticleDeleteView.as_view(), name='article_delete'),
      path('upload_json/', views.UploadJsonView.as_view(), name='upload_json'),
      path('edit_article_from_json/<int:index>/', views.EditArticleFromJsonView.as_view(), name='edit_article_from_json'),
+     path('subscribe/author/<int:author_id>/',  # POST
+          views.ToggleAuthorSubscriptionView.as_view(),
+          name='toggle_author_subscription'),
+     path('subscribe/tag/<int:tag_id>/',  # POST
+          views.ToggleTagSubscriptionView.as_view(),
+          name='toggle_tag_subscription'),
  ]

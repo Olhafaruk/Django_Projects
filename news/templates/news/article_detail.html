@@ -1,131 +1,146 @@
 {% extends "base.html" %}
- {% load customtags %}
- {% block content %}
- <div class="container mt-4">
-     <article class="article-detail">
-         <!-- Заголовок -->
-         <h1 class="display-4 mb-4">{{ article.title }}</h1>
+<!-- Наследуем базовый шаблон для использования общих элементов интерфейса -->
 
-         <!-- Мета-информация -->
-         <div class="article-meta mb-4">
-             <span class="text-muted">
-                 <i class="bi bi-calendar"></i>
-                 {{ article.publication_date|date:"d E Y H:i" }}
-             </span>
-             <span class="ms-3 text-muted">
-                 <i class="bi bi-eye"></i>
-                 {{ article.views }}
-             </span>
-             <span class="ms-3 text-muted">
-                 <i class="bi bi-person-fill"></i> {{ article.author|default:'Аноним' }}
-             </span>
-         </div>
+{% load customtags %}
+<!-- Загружаем пользовательские теги для использования фильтров в шаблоне -->
 
-         <!-- Изображение -->
-         {% if article.image %}
-         <div class="article-image mb-5">
-             <img src="{{ article.image.url }}"
-                  alt="{{ article.title }}"
-                  class="img-fluid rounded-3 shadow"
-                  loading="lazy">
-             <div class="text-center mt-2 text-muted small">
-                 Изображение: {{ article.image.name|basename }}
-             </div>
-         </div>
-         {% endif %}
+{% block content %}
+<!-- Основной блок контента -->
+    {% include "include/search_form.html" %}
+    <!-- Включение формы поиска для удобного поиска статей -->
 
-         <!-- Содержание -->
-         <div class="article-content mb-5">
-             {{ article.content|linebreaks }}
-         </div>
+    <div class="card card-shadow">
+        <!-- Карточка статьи -->
+        <div class="card-body">
+            <span class="ms-3 text-muted">
+                <i class="bi bi-person-fill"></i> {{ article.author|default:'Аноним' }}
+                <!-- Отображение автора статьи или значение "Аноним", если автор не указан -->
+            </span>
+            <h5 class="card-title">{{ article.title }}</h5>
+            <!-- Заголовок статьи -->
 
-          <!-- Категория -->
-         <div class="article-taxonomy mb-3">
-             <a href="{% url 'news:get_news_by_category' article.category.id %}"
-                class="btn btn-sm btn-outline-primary">
-                 <i class="bi bi-bookmark"></i> {{ article.category }}
-             </a>
-         </div>
-         <!-- Теги -->
-         <div class="article-taxonomy mb-5">
-             <div class="d-flex flex-wrap gap-2">
-                 {% for tag in article.tags.all %}
-                 <a href="{% url 'news:get_news_by_tag' tag.id %}"
-                    class="btn btn-sm btn-outline-secondary"
-                    style="color: {{ tag|random_color }};">
-                     <i class="bi bi-tag"></i> {{ tag.name|upper }}
-                 </a>
-                 {% endfor %}
-             </div>
-         </div>
+            {% if article.image %}
+            <div class="article-image mb-5">
+                <img src="{{ article.image.url }}"
+                     alt="{{ article.title }}"
+                     class="img-fluid rounded-3 shadow"
+                     loading="lazy">
+                <!-- Отображение изображения статьи, если оно присутствует -->
+            </div>
+            {% endif %}
 
-         <!-- Лайки и избранное -->
-         <div class="article-actions border-top pt-4 mb-5">
-             <div class="d-flex gap-2 align-items-center">
-                 <form method="POST" action="{% url 'news:toggle_like' article.id %}" class="d-inline">
-                     {% csrf_token %}
-                     <button type="submit" class="btn btn-link p-0 text-decoration-none">
-                         {% if article|has_liked:user_ip %}
-                             <i class="bi bi-balloon-heart-fill text-danger fs-5"></i> {{ article.likes.count }}
-                         {% else %}
-                             <i class="bi bi-balloon-heart text-muted fs-5"></i> {{ article.likes.count }}
-                         {% endif %}
-                     </button>
-                 </form>
-                 <form method="POST" action="{% url 'news:toggle_favorite' article.id %}">
-                     {% csrf_token %}
-                     <button type="submit" class="btn btn-link p-0 text-decoration-none">
-                         {% if article|has_favorited:user_ip %}
-                             <i class="bi bi-star-fill text-warning fs-5"></i>
-                         {% else %}
-                             <i class="bi bi-star text-muted fs-5"></i>
-                         {% endif %}
-                     </button>
-                 </form>
-             </div>
-         </div>
-         <!-- Кнопки управления -->
+            <p class="card-text">{{ article.content }}</p>
+            <!-- Текст статьи -->
 
-                  {% if article|can_edit:user %}
-             <div class="article-actions border-top pt-4">
-                 <div class="d-flex gap-2">
-                     <a href="{% url 'news:article_update' article.id %}" class="btn btn-warning">
-                         <i class="bi bi-pencil-square"></i> Редактировать
-                     </a>
-                     <a href="{% url 'news:article_delete' article.id %}" class="btn btn-danger">
-                         <i class="bi bi-trash"></i> Удалить
-                     </a>
-                 </div>
-             </div>
-         {% endif %}
-          <!-- Секция комментариев -->
-         <div class="comments-section mt-5">
-           <h4>Комментарии</h4>
-           {% if comments %}
-             {% for comment in comments %}
-               <div class="card mb-2">
-                 <div class="card-body">
-                   <p class="card-text">{{ comment.content }}</p>
-                   <small class="text-muted">
-                     {{ comment.user.username|default:"Аноним" }} – {{ comment.created_at|date:"d M Y H:i" }}
-                   </small>
-                 </div>
-               </div>
-             {% endfor %}
-           {% else %}
-             <p>Нет комментариев.</p>
-           {% endif %}
+            <div class="article-taxonomy mb-3">
+                <a href="{% url 'news:get_news_by_category' article.category.id %}"
+                   class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-bookmark"></i> {{ article.category }}
+                </a>
+                <!-- Ссылка на категорию статьи -->
+            </div>
 
-           {% if user.is_authenticated %}
-             <form method="post" action="">
-               {% csrf_token %}
-               {{ comment_form.as_p }}
-               <button type="submit" class="btn btn-primary">Оставить комментарий</button>
-             </form>
-           {% else %}
-             <p>Пожалуйста, <a href="{% url 'account_login' %}">войдите</a>, чтобы оставить комментарий.</p>
-           {% endif %}
-         </div>
-     </article>
- </div>
+            {% for tag in article.tags.all %}
+                <a href="{% url 'news:get_news_by_tag' tag.id %}" class="text-decoration-none" style="color: {{ tag|random_color }};">
+                    <i class="bi bi-hash"></i>{{ tag.name|upper }}
+                </a>
+                <!-- Список тегов статьи -->
+            {% endfor %}
+
+            <small class="text-muted"><i class="bi bi-calendar"></i> {{ article.publication_date }}</small>
+            <!-- Дата публикации статьи -->
+
+            <span><i class="bi bi-eye-fill"></i> {{ article.views }}</span>
+            <!-- Количество просмотров статьи -->
+
+            <div class="article-actions border-top pt-4 mb-5">
+                <!-- Блок действий (лайки, избранное) -->
+                <div class="d-flex gap-2 align-items-center">
+                    <form method="POST" action="{% url 'news:toggle_like' article.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link p-0 text-decoration-none">
+                            {% if article|has_liked:user_ip %}
+                                <i class="bi bi-balloon-heart-fill text-danger fs-5"></i> {{ article.likes.count }}
+                            {% else %}
+                                <i class="bi bi-balloon-heart text-muted fs-5"></i> {{ article.likes.count }}
+                            {% endif %}
+                        </button>
+                        <!-- Кнопка лайка -->
+                    </form>
+                    <form method="POST" action="{% url 'news:toggle_favorite' article.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link p-0 text-decoration-none">
+                            {% if article|has_favorited:user_ip %}
+                                <i class="bi bi-star-fill text-warning fs-5"></i>
+                            {% else %}
+                                <i class="bi bi-star text-muted fs-5"></i>
+                            {% endif %}
+                        </button>
+                        <!-- Кнопка добавления в избранное -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if article|can_edit:user %}
+    <div class="article-actions border-top pt-4">
+        <div class="d-flex gap-2">
+            <a href="{% url 'news:article_update' article.id %}" class="btn btn-warning">
+                <i class="bi bi-pencil-square"></i> Редактировать
+            </a>
+            <a href="{% url 'news:article_delete' article.id %}" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Удалить
+            </a>
+            <!-- Кнопки управления статьёй -->
+        </div>
+    </div>
+    {% endif %}
+
+    {% if article.author %}
+    <form method="POST"
+          action="{% url 'news:toggle_author_subscription' article.author.id %}"
+          class="mt-3">
+        {% csrf_token %}
+        {% if is_subscribed_author %}
+            <button class="btn btn-outline-secondary">
+                <i class="bi bi-person-dash"></i> Отписаться от автора
+            </button>
+        {% else %}
+            <button class="btn btn-outline-primary">
+                <i class="bi bi-person-plus"></i> Подписаться на автора
+            </button>
+        {% endif %}
+    </form>
+    <!-- Форма подписки на автора статьи -->
+    {% endif %}
+
+    <div class="comments-section mt-5">
+        <h4>Комментарии</h4>
+        {% if comments %}
+        {% for comment in comments %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <p class="card-text">{{ comment.content }}</p>
+                <small class="text-muted">
+                    {{ comment.user.username|default:"Аноним" }} – {{ comment.created_at|date:"d M Y H:i" }}
+                </small>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>Нет комментариев.</p>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit" class="btn btn-primary">Оставить комментарий</button>
+        </form>
+        {% else %}
+        <p>Пожалуйста, <a href="{% url 'account_login' %}">войдите</a>, чтобы оставить комментарий.</p>
+        {% endif %}
+    </div>
+    <!-- Секция комментариев -->
 {% endblock %}

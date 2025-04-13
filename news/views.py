@@ -3,23 +3,24 @@ import json
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-from django.db import models
 from django.db.models import F, Q
-
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.utils.text import slugify
 from django.views import View
-from django.views.generic import CreateView, DeleteView, ListView, TemplateView, UpdateView
 from django.views.generic.base import ContextMixin
+from django.views.generic import CreateView, DeleteView, ListView, TemplateView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-import unidecode
 
 from .forms import ArticleForm, ArticleUploadForm, CommentForm
-from .models import Article, Category, Favorite, Like, Tag
+from .models import Article, ArticleHistory, ArticleHistoryDetail, Category, Favorite, Like, Tag
+from .models import Article, ArticleHistory, ArticleHistoryDetail, Category, Favorite, Like, Tag, UserSubscription, \
+    TagSubscription
 
+import unidecode
+from django.db import models
+from django.utils.text import slugify
 
 
 class BaseMixin(ContextMixin):
@@ -71,18 +72,52 @@ class GetNewsByCategoryView(BaseArticleListView):
         context['active_category_id'] = self.kwargs['category_id']
         return context
 
-
+# Представление для отображения статей, связанных с определённым тегом
 class GetNewsByTagView(BaseArticleListView):
+    """
+       Представление для получения списка статей, связанных с определённым тегом.
+       """
     def get_queryset(self):
+        """
+                Метод возвращает набор данных (QuerySet) статей, связанных с тегом.
+                Для получения используется метод 'by_tag', который принимает ID тега.
+                """
         return Article.objects.by_tag(self.kwargs['tag_id'])
 
+    def get_context_data(self, **kwargs):
+        """
+                Метод добавляет дополнительный контекст в шаблон:
+                - активный тег;
+                - статус подписки на тег для текущего пользователя.
+                """
+        context = super().get_context_data(**kwargs) # Получаем контекст из базового класса
+        # Получаем тег на основе его ID из URL
+        tag = get_object_or_404(Tag, pk=self.kwargs["tag_id"])
+        context["active_tag"] = tag # Устанавливаем текущий тег как активный для шаблона
+        if self.request.user.is_authenticated:# Проверяем, авторизован ли пользователь
+            # Проверяем, подписан ли пользователь на данный тег
+            context["is_subscribed_tag"] = TagSubscription.objects.filter(subscriber=self.request.user, tag=tag).exists() #  Подписчик - текущий пользователь, Тег для подписки
+        else:# Если пользователь не авторизован, показываем, что подписка недоступна
+            context["is_subscribed_tag"] = False
+        return context# Возвращаем обновлённый контекст
 
-class GetAllNewsView(BaseArticleListView):
+
+class GetAllNewsView(BaseMixin, ListView):
+    model = Article
+    template_name = "news/catalog.html"
+    context_object_name = "news"
+    paginate_by = 10
+
     def get_queryset(self):
         return Article.objects.sorted(
             sort=self.request.GET.get('sort', 'publication_date'),
             order=self.request.GET.get('order', 'desc')
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_ip"] = self.request.META.get("REMOTE_ADDR")
+        return context
 
 
 class BaseToggleStatusView(BaseMixin, View):
@@ -223,9 +258,42 @@ def save_article(article_data, form=None):
     return article
 
 
-class MainView(BaseMixin, TemplateView):
-    template_name = 'main.html'
+class MainView(BaseMixin, ListView):
+    """
+    Главная страница `/` – выводит статьи авторов/тегов,
+    на которые подписан текущий пользователь.
+    Если подписок нет — возвращает пустой QuerySet.
+    """
 
+    template_name = "news/catalog.html"
+    paginate_by = 10
+    context_object_name = "articles"
+
+    def get_queryset(self):
+        order_by = self.request.GET.get("order_by", "-publication_date")
+        qs = Article.objects.select_related("category").prefetch_related("tags")
+
+        user = self.request.user
+        if not user.is_authenticated:
+            return qs.none()
+
+        author_ids = user.subscribed_authors.values_list("author_id", flat=True)
+        tag_ids = user.subscribed_tags.values_list("tag_id", flat=True)
+
+        if author_ids or tag_ids:
+            qs = qs.filter(
+                Q(author_id__in=author_ids) | Q(tags__id__in=tag_ids)
+            ).distinct()
+        else:
+            qs = qs.none()
+
+        return qs.order_by(order_by)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_feed"] = True          # признак «это лента подписок»
+        context["active_tag"] = None       # чтобы шаблон не путал с тег‑страницей
+        return context
 
 class AboutView(BaseMixin, TemplateView):
     template_name = 'about.html'
@@ -241,6 +309,15 @@ class ArticleDetailView(BaseMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['comment_form'] = CommentForm()
+        # подписка на автора
+        if self.request.user.is_authenticated and self.object.author:
+            context["is_subscribed_author"] = UserSubscription.objects.filter(
+                subscriber=self.request.user,
+                author=self.object.author
+            ).exists()
+        else:
+            context["is_subscribed_author"] = False
+
         # Получаем все комментарии для данной статьи
         context['comments'] = self.object.comments.all()
         return context
@@ -356,3 +433,73 @@ class ArticleDeleteView(LoginRequiredMixin, BaseMixin, DeleteView):
         if self.request.user.is_superuser or self.request.user.groups.filter(name="Moderator").exists():
             return qs
         return qs.filter(author=self.request.user)
+
+
+# ------------------ TOGGLE AUTHOR SUBSCRIPTION ----------------------
+
+class ToggleAuthorSubscriptionView(LoginRequiredMixin, View):
+    """
+    Представление для переключения подписки на автора.
+    POST‑эндпоинт: /subscribe/author/<author_id>/.
+
+    Пользователь может подписаться или отписаться от автора.
+    Если подписка существует, она удаляется.
+    Если подписка отсутствует, создаётся новая.
+    """
+
+    def post(self, request, author_id, *args, **kwargs):
+        """
+        Метод обрабатывает POST-запрос:
+        1. Получает или создаёт запись подписки через `get_or_create`.
+        2. Если подписка уже существовала, она удаляется.
+        3. Перенаправляет пользователя обратно на предыдущую страницу.
+
+        :param request: HTTP-запрос пользователя.
+        :param author_id: ID автора, на которого переключается подписка.
+        """
+        # Получаем или создаём подписку текущего пользователя на указанного автора
+        sub, created = UserSubscription.objects.get_or_create(
+            subscriber=request.user,  # Текущий пользователь
+            author_id=author_id,  # ID автора из URL
+        )
+        if not created:
+            # Удаляем подписку, если она уже существовала
+            sub.delete()
+
+        # Перенаправляем пользователя на предыдущую страницу или на главную
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER", "/"))
+
+
+# ------------------ TOGGLE TAG SUBSCRIPTION ----------------------
+
+class ToggleTagSubscriptionView(LoginRequiredMixin, View):
+    """
+    Представление для переключения подписки на тег.
+    POST‑эндпоинт: /subscribe/tag/<tag_id>/.
+
+    Пользователь может подписаться или отписаться от тега.
+    Если подписка существует, она удаляется.
+    Если подписка отсутствует, создаётся новая.
+    """
+
+    def post(self, request, tag_id, *args, **kwargs):
+        """
+        Метод обрабатывает POST-запрос:
+        1. Получает или создаёт запись подписки через `get_or_create`.
+        2. Если подписка уже существовала, она удаляется.
+        3. Перенаправляет пользователя обратно на предыдущую страницу.
+
+        :param request: HTTP-запрос пользователя.
+        :param tag_id: ID тега, на который переключается подписка.
+        """
+        # Получаем или создаём подписку текущего пользователя на указанный тег
+        sub, created = TagSubscription.objects.get_or_create(
+            subscriber=request.user,  # Текущий пользователь
+            tag_id=tag_id,  # ID тега из URL
+        )
+        if not created:
+            # Удаляем подписку, если она уже существовала
+            sub.delete()
+
+        # Перенаправляем пользователя на предыдущую страницу или на главную
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER", "/"))

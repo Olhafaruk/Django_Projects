@@ -3,6 +3,37 @@
 
  {% block content %}
      {% include "include/search_form.html" %}
+
+     {% if is_feed %}
+       <h2 class="mb-4">Лента ваших подписок</h2>
+       {% if not articles %}
+           <div class="alert alert-info">
+               Пока здесь пусто. Подпишитесь на авторов или теги, чтобы видеть их статьи.
+           </div>
+       {% endif %}
+     {% endif %}
+
+     {# --- кнопка подписки, когда мы на странице конкретного тега --- #}
+     {% if active_tag %}
+     <div class="d-flex justify-content-between align-items-center mb-3">
+           <h2 class="m-0">
+               Статьи по тегу «{{ active_tag.name }}»
+           </h2>
+           <form method="POST"
+                 action="{% url 'news:toggle_tag_subscription' active_tag.id %}">
+               {% csrf_token %}
+               {% if is_subscribed_tag %}
+                   <button class="btn btn-outline-secondary">
+                       <i class="bi bi-bell-slash"></i> Отписаться
+                   </button>
+               {% else %}
+                   <button class="btn btn-outline-primary">
+                       <i class="bi bi-bell"></i> Подписаться на тег
+                   </button>
+               {% endif %}
+           </form>
+     </div>
+     {% endif %}
      <h1 class="text-center mb-4"></h1>
 
      <div class="row">
