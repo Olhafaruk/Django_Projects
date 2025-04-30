@@ -16,6 +16,7 @@ django-debug-toolbar==5.0.1
 django-extensions==3.2.3
 django-jazzmin==3.0.1
 executing==2.2.0
+gunicorn==23.0.0
 fastapi==0.115.6
 Flask==3.1.0
 google-auth==2.38.0
